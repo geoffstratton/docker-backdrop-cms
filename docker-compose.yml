@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  backdrop:
+    build: .
+    image: backdrop:apache
+    container_name: backdrop
+    restart: unless-stopped
+    links:
+      - "backdrop-db:database"
+    networks:
+      - backdrop
+    ports:
+      - ${BACKDROP_PORT}:80
+    volumes:
+      - /var/lib/docker/volumes/backdrop/_data/files:/var/www/html/files:rw
+      - /var/lib/docker/volumes/backdrop/_data/sites:/var/www/html/sites
+      - /var/lib/docker/volumes/backdrop/_data/layouts:/var/www/html/layouts
+      - /var/lib/docker/volumes/backdrop/_data/modules:/var/www/html/modules
+      - /var/lib/docker/volumes/backdrop/_data/themes:/var/www/html/themes
+    environment:
+      BACKDROP_DB_HOST    : "${BACKDROP_DB_HOST}"
+      BACKDROP_DB_PORT    : "${BACKDROP_DB_PORT}"
+      BACKDROP_DB_NAME    : "${BACKDROP_DB_NAME}"
+      BACKDROP_DB_USER    : "${BACKDROP_DB_USER}"
+      BACKDROP_DB_PASSWORD: "${BACKDROP_DB_USER_PASSWORD}"
+    depends_on:
+      - backdrop-db
+
+  backdrop-db:
+    image: mariadb:latest
+    container_name: ${BACKDROP_DB_HOST}
+    networks:
+      - backdrop
+    ports:
+      - ${BACKDROP_DB_PORT}:3306
+    volumes:
+      - /var/lib/docker/volumes/backdrop_db/_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE     : "${BACKDROP_DB_NAME}"
+      MYSQL_ROOT_PASSWORD: "${BACKDROP_DB_ROOT_PASSWORD}"
+      MYSQL_USER         : "${BACKDROP_DB_USER}"
+      MYSQL_PASSWORD     : "${BACKDROP_DB_USER_PASSWORD}"
+
+networks:
+  backdrop:
+    driver: bridge
