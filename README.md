@@ -14,7 +14,7 @@ To use, simply download the repo, adjust the .env file with your DB password and
 
 License
 -------
-Apache 2.0
+GNU General Public License v3.0
 
 Author Information
 ------------------
